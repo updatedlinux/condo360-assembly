@@ -271,14 +271,7 @@ class Condo360_Asamblea_Live {
 		$youtube_url = get_option( 'condo360_asamblea_youtube_url', '' );
 		
 		if ( empty( $youtube_url ) ) {
-			return '
-			<div class="condo360-asamblea-container">
-				<div class="condo360-asamblea-no-url">
-					<p>Por favor, configure la URL de YouTube en el panel de administración de WordPress.</p>
-					<p><small>Configuración → Asamblea en Vivo</small></p>
-				</div>
-			</div>
-			';
+			return '<p style="text-align: center; padding: 20px; color: #666;">Por favor, configure la URL de YouTube en el panel de administración de WordPress.<br><small>Configuración → Asamblea en Vivo</small></p>';
 		}
 		
 		$youtube_id = $this->get_youtube_id( $youtube_url );
@@ -300,150 +293,59 @@ class Condo360_Asamblea_Live {
 		}
 		// Si no podemos parsear, mostrar error
 		else {
-			return '
-			<div class="condo360-asamblea-container">
-				<div class="condo360-asamblea-no-url">
-					<p>Error: La URL de YouTube no es válida. Por favor, verifique la configuración.</p>
-					<p><small>Configuración → Asamblea en Vivo</small></p>
-					<p><small>URL configurada: ' . esc_html( $youtube_url ) . '</small></p>
-				</div>
-			</div>
-			';
+			return '<p style="text-align: center; padding: 20px; color: #d00;">Error: La URL de YouTube no es válida. Por favor, verifique la configuración.<br><small>Configuración → Asamblea en Vivo</small></p>';
 		}
 		
 		// Agregar parámetros para mejor reproducción
 		$separator = ( strpos( $embed_url, '?' ) !== false ) ? '&' : '?';
 		$embed_url .= $separator . 'autoplay=0&rel=0&modestbranding=1';
 		
-		// Debug: Verificar que la URL esté correcta (solo para administradores)
-		$debug_info = '';
-		if ( current_user_can( 'manage_options' ) && isset( $_GET['debug_asamblea'] ) ) {
-			$debug_info = '<div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-size: 12px;">
-				<strong>Debug Info:</strong><br>
-				URL Original: ' . esc_html( $youtube_url ) . '<br>
-				YouTube ID: ' . esc_html( $youtube_id ) . '<br>
-				Embed URL: ' . esc_html( $embed_url ) . '
-			</div>';
-		}
-		
 		ob_start();
 		?>
 		<style>
-		/* Contenedor principal - Resoluciones estándar PC */
-		.condo360-asamblea-container {
-			max-width: 1400px !important;
-			margin: 30px auto !important;
-			padding: 0 !important;
-			background: #ffffff !important;
-			border-radius: 16px !important;
-			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-			border: 1px solid #e1e5e9 !important;
-			overflow: hidden !important;
-			width: 95% !important;
-			box-sizing: border-box !important;
-			display: block !important;
-			position: relative !important;
+		.condo360-asamblea-subtitle {
+			text-align: center;
+			font-size: 18px;
+			color: #666;
+			margin-bottom: 15px;
+			font-weight: 500;
 		}
-		
-		/* Sección del video - Padding reducido para video más grande */
-		.condo360-asamblea-video-section {
-			width: 100% !important;
-			padding: 20px !important;
-			background: transparent !important;
-			border: none !important;
-			box-sizing: border-box !important;
-			display: block !important;
-		}
-		
-		/* Wrapper del video - Tamaño grande para PC */
 		.condo360-asamblea-video-wrapper {
-			position: relative !important;
-			width: 100% !important;
-			padding-bottom: 56.25% !important; /* 16:9 aspect ratio - esto calcula la altura automáticamente */
-			height: 0 !important;
-			overflow: hidden !important;
-			border-radius: 12px !important;
-			background: #000 !important;
-			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+			position: relative;
+			width: 1280px;
+			height: 720px;
+			max-width: 100%;
+			margin: 0 auto;
 		}
-		
-		/* Iframe del video - Asegurar que se vea y ocupe todo el espacio */
 		.condo360-asamblea-video-wrapper iframe {
-			position: absolute !important;
-			top: 0 !important;
-			left: 0 !important;
-			width: 100% !important;
-			height: 100% !important;
-			border: none !important;
-			display: block !important;
-			z-index: 1 !important;
+			width: 100%;
+			height: 100%;
+			border: none;
 		}
-		
-		/* Asegurar que el wrapper tenga contenido visible */
-		.condo360-asamblea-video-wrapper:empty::after {
-			content: "Cargando reproductor..." !important;
-			position: absolute !important;
-			top: 50% !important;
-			left: 50% !important;
-			transform: translate(-50%, -50%) !important;
-			color: #fff !important;
-			font-size: 16px !important;
-		}
-		
-		/* Para pantallas grandes (1920px y más) */
-		@media (min-width: 1920px) {
-			.condo360-asamblea-container {
-				max-width: 1600px !important;
+		@media (max-width: 1320px) {
+			.condo360-asamblea-video-wrapper {
+				width: 100%;
+				height: 0;
+				padding-bottom: 56.25%; /* 16:9 aspect ratio */
 			}
-			.condo360-asamblea-video-section {
-				padding: 30px !important;
-			}
-		}
-		
-		/* Para pantallas medianas (1366px - 1919px) */
-		@media (min-width: 1366px) and (max-width: 1919px) {
-			.condo360-asamblea-container {
-				max-width: 1300px !important;
-			}
-		}
-		
-		/* Para pantallas estándar (1024px - 1365px) */
-		@media (min-width: 1024px) and (max-width: 1365px) {
-			.condo360-asamblea-container {
-				max-width: 1200px !important;
-			}
-		}
-		
-		/* Solo aplicar responsive para tablets y móviles */
-		@media (max-width: 1023px) {
-			.condo360-asamblea-container {
-				max-width: 100% !important;
-				margin: 20px !important;
-				width: calc(100% - 40px) !important;
-				border-radius: 12px !important;
-			}
-			.condo360-asamblea-video-section {
-				padding: 15px !important;
+			.condo360-asamblea-video-wrapper iframe {
+				position: absolute;
+				top: 0;
+				left: 0;
 			}
 		}
 		</style>
-		<?php echo $debug_info; ?>
-		<div class="condo360-asamblea-container">
-			<!-- Contenedor del video -->
-			<div class="condo360-asamblea-video-section">
-				<div class="condo360-asamblea-video-wrapper">
-					<iframe 
-						src="<?php echo esc_url( $embed_url ); ?>" 
-						title="<?php esc_attr_e( 'Asamblea General de Condominio en Vivo', 'condo360-asamblea' ); ?>"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-						allowfullscreen="true"
-						width="100%"
-						height="100%"
-						frameborder="0"
-						style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
-					></iframe>
-				</div>
-			</div>
+		<div class="condo360-asamblea-subtitle">Transmisión en vivo desde YouTube</div>
+		<div class="condo360-asamblea-video-wrapper">
+			<iframe 
+				src="<?php echo esc_url( $embed_url ); ?>" 
+				title="<?php esc_attr_e( 'Asamblea General de Condominio en Vivo', 'condo360-asamblea' ); ?>"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+				allowfullscreen="true"
+				width="1280"
+				height="720"
+				frameborder="0"
+			></iframe>
 		</div>
 		<?php
 		return ob_get_clean();
