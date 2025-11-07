@@ -68,6 +68,7 @@ class Condo360_Asamblea_Live {
 		$patterns = array(
 			'/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/',
 			'/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/',
+			'/youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/',
 		);
 		
 		foreach ( $patterns as $pattern ) {
@@ -77,7 +78,7 @@ class Condo360_Asamblea_Live {
 		}
 		
 		// Si no se encuentra un patrón, intentar usar la URL completa
-		return $url;
+		return '';
 	}
 	
 	public function render_admin_page() {
@@ -263,25 +264,48 @@ class Condo360_Asamblea_Live {
 		
 		$youtube_id = $this->get_youtube_id( $youtube_url );
 		
-		// Si es una URL completa de embed o live, usarla directamente
+		// Construir la URL de embed
 		$embed_url = '';
-		if ( strpos( $youtube_url, 'youtube.com/embed/' ) !== false || strpos( $youtube_url, 'youtube.com/live/' ) !== false ) {
-			// Si ya es una URL de embed, usarla directamente
-			if ( strpos( $youtube_url, 'youtube.com/live/' ) !== false ) {
-				$embed_url = str_replace( 'youtube.com/live/', 'youtube.com/embed/', $youtube_url );
-			} else {
-				$embed_url = $youtube_url;
-			}
-		} elseif ( ! empty( $youtube_id ) && strlen( $youtube_id ) === 11 ) {
-			// Si tenemos un ID válido, construir la URL de embed
-			$embed_url = 'https://www.youtube.com/embed/' . esc_attr( $youtube_id );
-		} else {
-			// Si no podemos parsear, intentar usar la URL directamente
-			$embed_url = esc_url( $youtube_url );
+		
+		// Si ya es una URL de embed, usarla directamente
+		if ( strpos( $youtube_url, 'youtube.com/embed/' ) !== false ) {
+			$embed_url = $youtube_url;
+		}
+		// Si es una URL de live, convertirla a embed
+		elseif ( strpos( $youtube_url, 'youtube.com/live/' ) !== false ) {
+			$embed_url = str_replace( 'youtube.com/live/', 'youtube.com/embed/', $youtube_url );
+		}
+		// Si tenemos un ID válido, construir la URL de embed
+		elseif ( ! empty( $youtube_id ) && strlen( $youtube_id ) === 11 ) {
+			$embed_url = 'https://www.youtube.com/embed/' . $youtube_id;
+		}
+		// Si no podemos parsear, mostrar error
+		else {
+			return '
+			<div class="condo360-asamblea-container">
+				<div class="condo360-asamblea-no-url">
+					<p>Error: La URL de YouTube no es válida. Por favor, verifique la configuración.</p>
+					<p><small>Configuración → Asamblea en Vivo</small></p>
+					<p><small>URL configurada: ' . esc_html( $youtube_url ) . '</small></p>
+				</div>
+			</div>
+			';
 		}
 		
 		// Agregar parámetros para mejor reproducción
-		$embed_url .= ( strpos( $embed_url, '?' ) !== false ? '&' : '?' ) . 'autoplay=0&rel=0&modestbranding=1';
+		$separator = ( strpos( $embed_url, '?' ) !== false ) ? '&' : '?';
+		$embed_url .= $separator . 'autoplay=0&rel=0&modestbranding=1';
+		
+		// Debug: Verificar que la URL esté correcta (solo para administradores)
+		$debug_info = '';
+		if ( current_user_can( 'manage_options' ) && isset( $_GET['debug_asamblea'] ) ) {
+			$debug_info = '<div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-size: 12px;">
+				<strong>Debug Info:</strong><br>
+				URL Original: ' . esc_html( $youtube_url ) . '<br>
+				YouTube ID: ' . esc_html( $youtube_id ) . '<br>
+				Embed URL: ' . esc_html( $embed_url ) . '
+			</div>';
+		}
 		
 		ob_start();
 		?>
@@ -315,12 +339,26 @@ class Condo360_Asamblea_Live {
 		.condo360-asamblea-video-wrapper {
 			position: relative !important;
 			width: 100% !important;
-			padding-bottom: 56.25% !important; /* 16:9 aspect ratio */
+			padding-bottom: 56.25% !important; /* 16:9 aspect ratio - esto crea la altura */
 			height: 0 !important;
 			overflow: hidden !important;
 			border-radius: 12px !important;
 			background: #000 !important;
 			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+		}
+		
+		/* Asegurar altura mínima visible en PC */
+		@media (min-width: 1024px) {
+			.condo360-asamblea-video-wrapper {
+				min-height: 600px !important;
+				padding-bottom: 0 !important; /* Desactivar padding-bottom cuando hay min-height */
+			}
+		}
+		
+		@media (min-width: 1024px) and (max-width: 1365px) {
+			.condo360-asamblea-video-wrapper {
+				min-height: 550px !important;
+			}
 		}
 		
 		/* Iframe del video - Asegurar que se vea */
@@ -372,6 +410,7 @@ class Condo360_Asamblea_Live {
 			}
 		}
 		</style>
+		<?php echo $debug_info; ?>
 		<div class="condo360-asamblea-container">
 			<!-- Contenedor del video -->
 			<div class="condo360-asamblea-video-section">
@@ -379,12 +418,12 @@ class Condo360_Asamblea_Live {
 					<iframe 
 						src="<?php echo esc_url( $embed_url ); ?>" 
 						title="<?php esc_attr_e( 'Asamblea General de Condominio en Vivo', 'condo360-asamblea' ); ?>"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-						allowfullscreen
-						loading="lazy"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+						allowfullscreen="true"
 						width="100%"
 						height="100%"
 						frameborder="0"
+						style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
 					></iframe>
 				</div>
 			</div>
