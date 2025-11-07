@@ -139,30 +139,7 @@ class Condo360_Asamblea_Live {
 			max-width: 1200px;
 			margin: 0 auto;
 			padding: 20px;
-		}
-		
-		/* Header de Asamblea */
-		.condo360-asamblea-header {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
-			padding: 40px;
-			border-radius: 16px;
-			text-align: center;
-			margin-bottom: 30px;
-			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-		}
-		
-		.condo360-asamblea-header h1 {
-			font-size: 32px;
-			font-weight: 700;
-			margin: 0 0 10px 0;
-			color: #ffffff !important;
-		}
-		
-		.condo360-asamblea-header p {
-			font-size: 18px;
-			margin: 0;
-			opacity: 0.9;
+			width: 100%;
 		}
 		
 		/* Contenedor del video */
@@ -172,7 +149,8 @@ class Condo360_Asamblea_Live {
 			padding: 30px;
 			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 			border: 1px solid #e1e5e9;
-			margin-bottom: 30px;
+			width: 100%;
+			box-sizing: border-box;
 		}
 		
 		.condo360-asamblea-video-wrapper {
@@ -183,6 +161,7 @@ class Condo360_Asamblea_Live {
 			border-radius: 12px;
 			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 			background: #000;
+			width: 100%;
 		}
 		
 		.condo360-asamblea-video-wrapper iframe {
@@ -217,26 +196,42 @@ class Condo360_Asamblea_Live {
 			color: #6b7280;
 		}
 		
-		/* Responsive */
+		/* Responsive para tablets */
+		@media (max-width: 1024px) {
+			.condo360-asamblea-container {
+				padding: 20px;
+			}
+			
+			.condo360-asamblea-video-section {
+				padding: 25px;
+			}
+		}
+		
+		/* Responsive para móviles */
 		@media (max-width: 768px) {
 			.condo360-asamblea-container {
 				padding: 15px;
 			}
 			
-			.condo360-asamblea-header {
-				padding: 30px 20px;
+			.condo360-asamblea-video-section {
+				padding: 15px;
+				border-radius: 12px;
 			}
 			
-			.condo360-asamblea-header h1 {
-				font-size: 24px;
+			.condo360-asamblea-video-wrapper {
+				border-radius: 8px;
 			}
-			
-			.condo360-asamblea-header p {
-				font-size: 16px;
+		}
+		
+		/* Responsive para móviles pequeños */
+		@media (max-width: 480px) {
+			.condo360-asamblea-container {
+				padding: 10px;
 			}
 			
 			.condo360-asamblea-video-section {
-				padding: 20px;
+				padding: 10px;
+				border-radius: 8px;
 			}
 		}
 		';
@@ -281,12 +276,6 @@ class Condo360_Asamblea_Live {
 		ob_start();
 		?>
 		<div class="condo360-asamblea-container">
-			<!-- Header de Asamblea -->
-			<div class="condo360-asamblea-header">
-				<h1><?php esc_html_e( 'Asamblea General de Condominio en Vivo', 'condo360-asamblea' ); ?></h1>
-				<p><?php esc_html_e( 'Transmisión en vivo desde YouTube', 'condo360-asamblea' ); ?></p>
-			</div>
-			
 			<!-- Contenedor del video -->
 			<div class="condo360-asamblea-video-section">
 				<div class="condo360-asamblea-video-wrapper">
