@@ -129,62 +129,58 @@ class Condo360_Asamblea_Live {
 	}
 	
 	public function enqueue_styles() {
-		wp_add_inline_style( 'wp-block-library', $this->get_custom_styles() );
+		// Registrar y encolar estilos para asegurar que se carguen
+		wp_register_style( 'condo360-asamblea-styles', false );
+		wp_enqueue_style( 'condo360-asamblea-styles' );
+		wp_add_inline_style( 'condo360-asamblea-styles', $this->get_custom_styles() );
 	}
 	
 	public function get_custom_styles() {
 		return '
-		/* Contenedor de Asamblea en Vivo */
+		/* Contenedor principal con estilo moderno - Similar a wc-custom-card */
 		.condo360-asamblea-container {
-			max-width: 1600px;
-			margin: 0 auto;
-			padding: 30px 20px;
-			width: 100%;
-			box-sizing: border-box;
-		}
-		
-		/* Contenedor del video */
-		.condo360-asamblea-video-section {
-			background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-			border-radius: 20px;
-			padding: 20px;
-			box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
-			border: 2px solid rgba(102, 126, 234, 0.2);
-			width: 100%;
-			box-sizing: border-box;
-			position: relative;
+			max-width: 1200px;
+			margin: 30px auto;
+			padding: 0;
+			background: #ffffff;
+			border-radius: 16px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			border: 1px solid #e1e5e9;
 			overflow: hidden;
+			width: 100%;
+			box-sizing: border-box;
 		}
 		
-		.condo360-asamblea-video-section::before {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			height: 4px;
-			background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+		/* Contenedor del video - Similar a wc-form-wrapper */
+		.condo360-asamblea-video-section {
+			width: 100%;
+			padding: 40px;
+			background: transparent;
+			border: none;
+			box-sizing: border-box;
 		}
 		
+		/* Wrapper del video - debe ser grande y visible */
 		.condo360-asamblea-video-wrapper {
 			position: relative;
+			width: 100%;
 			padding-bottom: 56.25%; /* 16:9 aspect ratio */
 			height: 0;
 			overflow: hidden;
-			border-radius: 16px;
-			box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25), 0 4px 15px rgba(0, 0, 0, 0.2);
+			border-radius: 12px;
 			background: #000;
-			width: 100%;
-			border: 3px solid rgba(102, 126, 234, 0.1);
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 		}
 		
 		.condo360-asamblea-video-wrapper iframe {
 			position: absolute;
 			top: 0;
 			left: 0;
-			width: 100%;
-			height: 100%;
+			width: 100% !important;
+			height: 100% !important;
 			border: none;
+			min-width: 100%;
+			min-height: 100%;
 		}
 		
 		/* Mensaje cuando no hay URL configurada */
@@ -192,9 +188,9 @@ class Condo360_Asamblea_Live {
 			text-align: center;
 			padding: 60px 40px;
 			color: #6b7280;
-			background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-			border-radius: 16px;
-			border: 2px dashed rgba(102, 126, 234, 0.3);
+			background: #ffffff;
+			border-radius: 12px;
+			border: 2px dashed #e5e7eb;
 		}
 		
 		.condo360-asamblea-no-url::before {
@@ -210,69 +206,42 @@ class Condo360_Asamblea_Live {
 			color: #6b7280;
 		}
 		
-		/* Estilos para pantallas grandes (PC) */
-		@media (min-width: 1400px) {
+		/* Responsive para tablets */
+		@media (max-width: 1024px) {
 			.condo360-asamblea-container {
-				max-width: 1800px;
-				padding: 40px 30px;
+				margin: 25px auto;
+				max-width: 95%;
 			}
 			
 			.condo360-asamblea-video-section {
 				padding: 30px;
-				border-radius: 24px;
-			}
-			
-			.condo360-asamblea-video-wrapper {
-				border-radius: 20px;
-			}
-		}
-		
-		/* Responsive para tablets */
-		@media (max-width: 1024px) {
-			.condo360-asamblea-container {
-				padding: 25px 15px;
-			}
-			
-			.condo360-asamblea-video-section {
-				padding: 18px;
-				border-radius: 16px;
-			}
-			
-			.condo360-asamblea-video-wrapper {
-				border-radius: 12px;
 			}
 		}
 		
 		/* Responsive para móviles */
 		@media (max-width: 768px) {
 			.condo360-asamblea-container {
-				padding: 20px 10px;
-			}
-			
-			.condo360-asamblea-video-section {
-				padding: 15px;
+				margin: 20px;
 				border-radius: 12px;
 			}
 			
+			.condo360-asamblea-video-section {
+				padding: 20px;
+			}
+			
 			.condo360-asamblea-video-wrapper {
-				border-radius: 10px;
-				border-width: 2px;
+				border-radius: 8px;
 			}
 		}
 		
 		/* Responsive para móviles pequeños */
 		@media (max-width: 480px) {
 			.condo360-asamblea-container {
-				padding: 15px 8px;
+				margin: 15px;
 			}
 			
 			.condo360-asamblea-video-section {
-				padding: 12px;
-				border-radius: 10px;
-			}
-			
-			.condo360-asamblea-video-wrapper {
-				border-radius: 8px;
+				padding: 15px;
 			}
 		}
 		';
@@ -316,6 +285,57 @@ class Condo360_Asamblea_Live {
 		
 		ob_start();
 		?>
+		<style>
+		.condo360-asamblea-container {
+			max-width: 1200px !important;
+			margin: 30px auto !important;
+			padding: 0 !important;
+			background: #ffffff !important;
+			border-radius: 16px !important;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+			border: 1px solid #e1e5e9 !important;
+			overflow: hidden !important;
+			width: 100% !important;
+			box-sizing: border-box !important;
+			display: block !important;
+		}
+		.condo360-asamblea-video-section {
+			width: 100% !important;
+			padding: 40px !important;
+			background: transparent !important;
+			border: none !important;
+			box-sizing: border-box !important;
+		}
+		.condo360-asamblea-video-wrapper {
+			position: relative !important;
+			width: 100% !important;
+			padding-bottom: 56.25% !important;
+			height: 0 !important;
+			overflow: hidden !important;
+			border-radius: 12px !important;
+			background: #000 !important;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+		}
+		.condo360-asamblea-video-wrapper iframe {
+			position: absolute !important;
+			top: 0 !important;
+			left: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			border: none !important;
+			min-width: 100% !important;
+			min-height: 100% !important;
+		}
+		@media (max-width: 768px) {
+			.condo360-asamblea-container {
+				margin: 20px !important;
+				border-radius: 12px !important;
+			}
+			.condo360-asamblea-video-section {
+				padding: 20px !important;
+			}
+		}
+		</style>
 		<div class="condo360-asamblea-container">
 			<!-- Contenedor del video -->
 			<div class="condo360-asamblea-video-section">
