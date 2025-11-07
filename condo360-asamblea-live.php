@@ -30,6 +30,25 @@ class Condo360_Asamblea_Live {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_shortcode( 'condo360_asamblea_live', array( $this, 'render_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		// Permitir iframes en el contenido
+		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_iframes' ), 10, 2 );
+	}
+	
+	public function allow_iframes( $tags, $context ) {
+		if ( 'post' === $context ) {
+			$tags['iframe'] = array(
+				'src' => true,
+				'width' => true,
+				'height' => true,
+				'frameborder' => true,
+				'allow' => true,
+				'allowfullscreen' => true,
+				'title' => true,
+				'style' => true,
+				'loading' => true,
+			);
+		}
+		return $tags;
 	}
 	
 	public function init() {
@@ -323,6 +342,7 @@ class Condo360_Asamblea_Live {
 			width: 95% !important;
 			box-sizing: border-box !important;
 			display: block !important;
+			position: relative !important;
 		}
 		
 		/* Sección del video - Padding reducido para video más grande */
@@ -339,7 +359,7 @@ class Condo360_Asamblea_Live {
 		.condo360-asamblea-video-wrapper {
 			position: relative !important;
 			width: 100% !important;
-			padding-bottom: 56.25% !important; /* 16:9 aspect ratio - esto crea la altura */
+			padding-bottom: 56.25% !important; /* 16:9 aspect ratio - esto calcula la altura automáticamente */
 			height: 0 !important;
 			overflow: hidden !important;
 			border-radius: 12px !important;
@@ -347,21 +367,7 @@ class Condo360_Asamblea_Live {
 			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
 		}
 		
-		/* Asegurar altura mínima visible en PC */
-		@media (min-width: 1024px) {
-			.condo360-asamblea-video-wrapper {
-				min-height: 600px !important;
-				padding-bottom: 0 !important; /* Desactivar padding-bottom cuando hay min-height */
-			}
-		}
-		
-		@media (min-width: 1024px) and (max-width: 1365px) {
-			.condo360-asamblea-video-wrapper {
-				min-height: 550px !important;
-			}
-		}
-		
-		/* Iframe del video - Asegurar que se vea */
+		/* Iframe del video - Asegurar que se vea y ocupe todo el espacio */
 		.condo360-asamblea-video-wrapper iframe {
 			position: absolute !important;
 			top: 0 !important;
@@ -371,6 +377,17 @@ class Condo360_Asamblea_Live {
 			border: none !important;
 			display: block !important;
 			z-index: 1 !important;
+		}
+		
+		/* Asegurar que el wrapper tenga contenido visible */
+		.condo360-asamblea-video-wrapper:empty::after {
+			content: "Cargando reproductor..." !important;
+			position: absolute !important;
+			top: 50% !important;
+			left: 50% !important;
+			transform: translate(-50%, -50%) !important;
+			color: #fff !important;
+			font-size: 16px !important;
 		}
 		
 		/* Para pantallas grandes (1920px y más) */
